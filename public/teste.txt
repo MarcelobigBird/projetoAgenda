@@ -1,0 +1,3 @@
+marcelo
+070160
+mongodb+srv://marcelo:070160@cursojs01.z2zp0f5.mongodb.net/?retryWrites=true&w=majority
