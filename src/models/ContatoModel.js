@@ -18,30 +18,30 @@ function Contato(body) {
     this.contato = null;
 };
 
- Contato.prototype.register = async function() {
+Contato.prototype.register = async function () {
     this.valida();
 
-    if(this.errors.length > 0) return;
+    if (this.errors.length > 0) return;
 
     this.contato = await ContatoModel.create(this.body);
- };
+};
 
- Contato.prototype.valida = function() {
+Contato.prototype.valida = function () {
     this.cleanUp();
 
     // Validação
     // O email precisa ser válido
-    if(this.body.email && !validator.isEmail(this.body.email)) this.errors.push('Email invalid');
+    if (this.body.email && !validator.isEmail(this.body.email)) this.errors.push('Email invalid');
     // Validação do campo nome
-    if(!this.body.nome) this.errors.push('Nome é um campo obrigatório');
+    if (!this.body.nome) this.errors.push('Nome é um campo obrigatório');
     // Validação do campo email e do campo telefone
-    if(!this.body.email && !this.body.telefone) {
-        this.errors.push('Pelo menos um contato precisa enviado: email ou telefone.');
+    if (!this.body.email && !this.body.telefone) {
+        this.errors.push('Pelo menos um contato precisa ser enviado: email ou telefone.');
     }
 
- };
+};
 
- Contato.prototype.cleanUp = function() {
+Contato.prototype.cleanUp = function () {
     for (let key in this.body) {
         if (typeof this.body[key] !== 'string') {
             this.body[key] = '';
@@ -51,20 +51,40 @@ function Contato(body) {
     this.body = {
         nome: this.body.nome,
         sobrenome: this.body.sobrenome,
-        email: this.body.email, 
+        email: this.body.email,
         telefone: this.body.telefone
     }
 
- };
+};
 
- // Funções estática
 
- Contato.buscaPorId = async function(id) {
+Contato.prototype.edit = async function(id) {
+    if(typeof id !== 'string') return;
+    this.valida();
+    if(this.errors.length > 0) return;
+    this.contato = await ContatoModel.findByIdAndUpdate(id, this.body, { new: true });
+
+};
+
+// Métodos estáticas
+
+Contato.buscaPorId = async function (id) {
     if (typeof id !== 'string') return;
 
-    const user = ContatoModel.findById(id);  
-    return user;
- }
+    const contato = await ContatoModel.findById(id);
+    return contato;
+};
 
+Contato.buscaContatos = async function() {
+    const contatos = await ContatoModel.find().sort({ criadoEm: -1 });
+    return contatos;
+};
+
+Contato.delete = async function(id) {
+    if (typeof id !== 'string') return;
+
+    const contatoApagado = await ContatoModel.findOneAndDelete({ _id: id});
+    return contatoApagado;_
+};
 
 module.exports = Contato;
